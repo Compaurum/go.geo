@@ -49,7 +49,7 @@ type testPointFloat struct {
 }
 
 func TestSurfaceValueAt(t *testing.T) {
-	bound := NewBound(3, 0, 3, 0)
+	bound := NewBound(0, 3, 3, 0)
 	surface := NewSurface(bound, 4, 4)
 
 	surface.Grid[1][1] = 0
@@ -81,7 +81,7 @@ type testPointPoint struct {
 }
 
 func TestSurfaceGradientAt(t *testing.T) {
-	bound := NewBound(2, 0, 2, 0)
+	bound := NewBound(0, 2, 2, 0)
 	surface := NewSurface(bound, 3, 3)
 
 	surface.Grid[0] = []float64{0, 1, 2}

@@ -6,29 +6,38 @@ import (
 	"strings"
 )
 
+//constants declare direction to extend bound using antimeridian
+const (
+	_ = iota
+	LEFT
+	RIGHT
+)
+
 // A Bound represents an enclosed "box" in the 2D Euclidean or Cartesian plane.
 // It does not know anything about the anti-meridian.
 type Bound struct {
 	sw, ne *Point
+	antimeridian bool
 }
 
 // NewBound creates a new bound given the parameters.
 func NewBound(west, east, south, north float64) *Bound {
 	return &Bound{
-		sw: &Point{math.Min(east, west), math.Min(north, south)},
-		ne: &Point{math.Max(east, west), math.Max(north, south)},
+		sw: &Point{west, math.Min(north, south)},
+		ne: &Point{east, math.Max(north, south)},
+		antimeridian: east < west,
 	}
 }
 
-// NewBoundFromPoints creates a new bound given two opposite corners.
-// These corners can be either sw/ne or se/nw.
-func NewBoundFromPoints(corner, oppositeCorner *Point) *Bound {
+// NewBoundFromPoints creates a new bound given two corners.
+// These corners can be either sw/ne or nw/se.
+func NewBoundFromPoints(leftCorner, rightCorner *Point) *Bound {
 	b := &Bound{
-		sw: corner.Clone(),
-		ne: corner.Clone(),
+		sw: leftCorner.Clone(),
+		ne: leftCorner.Clone(),
+		antimeridian: leftCorner.X() > rightCorner.X(),
 	}
-
-	b.Extend(oppositeCorner)
+	b.Extend(rightCorner, RIGHT)
 	return b
 }
 
@@ -176,16 +185,36 @@ func (b *Bound) Set(west, east, south, north float64) {
 }
 
 // Extend grows the bound to include the new point.
-func (b *Bound) Extend(point *Point) *Bound {
+func (b *Bound) Extend(point *Point, direction ...byte) *Bound {
 
 	// already included, no big deal
 	if b.Contains(point) {
 		return b
 	}
+	if b.antimeridian {
+		if len(direction) == 0 {
+			panic("There is no direction to extend bound with antimeridian")
+		}
+		b.extendBoundUsingAntimeridian(point, direction[0])
+	}else {
+		b.sw.SetX(math.Min(b.sw.X(), point.X()))
+		b.ne.SetX(math.Max(b.ne.X(), point.X()))
 
-	b.sw.SetX(math.Min(b.sw.X(), point.X()))
-	b.ne.SetX(math.Max(b.ne.X(), point.X()))
+		b.sw.SetY(math.Min(b.sw.Y(), point.Y()))
+		b.ne.SetY(math.Max(b.ne.Y(), point.Y()))
+	}
+	return b
+}
 
+func (b *Bound) extendBoundUsingAntimeridian(point *Point, direction ...byte) *Bound {
+	if len(direction) == 0 || (direction[0] != LEFT && direction[0] != RIGHT) {
+		panic("unused or wrong direction parameter")
+	}
+	if direction[0] == LEFT {
+		b.sw.SetX(point.X())
+	}else {
+		b.ne.SetX(point.X())
+	}
 	b.sw.SetY(math.Min(b.sw.Y(), point.Y()))
 	b.ne.SetY(math.Max(b.ne.Y(), point.Y()))
 
@@ -209,9 +238,14 @@ func (b *Bound) Contains(point *Point) bool {
 	if point.Y() < b.sw.Y() || b.ne.Y() < point.Y() {
 		return false
 	}
-
-	if point.X() < b.sw.X() || b.ne.X() < point.X() {
-		return false
+	if !b.antimeridian {
+		if point.X() < b.sw.X() || b.ne.X() < point.X() {
+			return false
+		}
+	}else {
+		if !(b.sw.X() <= point.X() && point.X() <= MAX_LONGITUDE || MIN_LONGITUDE <= point.X() && point.X() <= b.ne.X()) {
+			return false
+		}
 	}
 
 	return true
@@ -355,6 +389,11 @@ func (b *Bound) Right() float64 {
 // Left returns the west side of the bound.
 func (b *Bound) Left() float64 {
 	return b.sw[0]
+}
+
+// IsAntimeridian returns true if the bound uses antimeridian.
+func (b *Bound) IsAntimeridian() bool {
+	return  b.antimeridian
 }
 
 // Empty returns true if it contains zero area or if

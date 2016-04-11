@@ -27,6 +27,13 @@ var maxLongitude = deg2rad(180)
 // GeoHashPrecision is the number of characters of a encoded GeoHash.
 var GeoHashPrecision = 12
 
+const (
+	MIN_LONGITUDE = -180.0
+	MAX_LONGITUDE = 180.0
+	MIN_LATITUDE = -90.0
+	MAX_LATITUDE = 90.0
+)
+
 func yesHaversine(haversine []bool) bool {
 	return (len(haversine) != 0 && haversine[0]) || (UseHaversineGeoDistanceByDefault && len(haversine) == 0)
 }
