@@ -12,7 +12,7 @@ type testValue struct {
 }
 
 func TestSurfacePointAt(t *testing.T) {
-	surface := NewSurface(NewBound(3, 0, 3, 0), 7, 7)
+	surface := NewSurface(NewBound(0, 3, 3, 0), 7, 7)
 
 	tests := []testValue{
 		{0, 0, &Point{0, 0}}, {1, 1, &Point{0.5, 0.5}}, {2, 2, &Point{1, 1}}, {3, 3, &Point{1.5, 1.5}},

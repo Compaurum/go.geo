@@ -129,7 +129,7 @@ func (ps PointSet) Bound() *Bound {
 		maxY = math.Max(maxY, v.Y())
 	}
 
-	return NewBound(maxX, minX, maxY, minY)
+	return NewBound(minX, maxX, maxY, minY)
 }
 
 // SetAt updates a position at i in the point set
