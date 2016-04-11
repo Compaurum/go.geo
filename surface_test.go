@@ -153,7 +153,7 @@ func TestSurfaceGradientAt(t *testing.T) {
 }
 
 func TestSurfaceWriteOffFile(t *testing.T) {
-	bound := NewBound(3, 0, 3, 0)
+	bound := NewBound(0, 3, 3, 0)
 	surface := NewSurface(bound, 4, 4)
 
 	surface.Grid[1][1] = 0
