@@ -30,8 +30,8 @@ var GeoHashPrecision = 12
 const (
 	MIN_LONGITUDE = -180.0
 	MAX_LONGITUDE = 180.0
-	MIN_LATITUDE = -90.0
-	MAX_LATITUDE = 90.0
+	MIN_LATITUDE  = -90.0
+	MAX_LATITUDE  = 90.0
 )
 
 func yesHaversine(haversine []bool) bool {

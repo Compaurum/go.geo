@@ -16,15 +16,15 @@ const (
 // A Bound represents an enclosed "box" in the 2D Euclidean or Cartesian plane.
 // It does not know anything about the anti-meridian.
 type Bound struct {
-	sw, ne *Point
+	sw, ne       *Point
 	antimeridian bool
 }
 
 // NewBound creates a new bound given the parameters.
 func NewBound(west, east, south, north float64) *Bound {
 	return &Bound{
-		sw: &Point{west, math.Min(north, south)},
-		ne: &Point{east, math.Max(north, south)},
+		sw:           &Point{west, math.Min(north, south)},
+		ne:           &Point{east, math.Max(north, south)},
 		antimeridian: east < west,
 	}
 }
@@ -33,8 +33,8 @@ func NewBound(west, east, south, north float64) *Bound {
 // These corners can be either sw/ne or nw/se.
 func NewBoundFromPoints(leftCorner, rightCorner *Point) *Bound {
 	b := &Bound{
-		sw: leftCorner.Clone(),
-		ne: leftCorner.Clone(),
+		sw:           leftCorner.Clone(),
+		ne:           leftCorner.Clone(),
 		antimeridian: leftCorner.X() > rightCorner.X(),
 	}
 	b.Extend(rightCorner, RIGHT)
@@ -196,7 +196,7 @@ func (b *Bound) Extend(point *Point, direction ...byte) *Bound {
 			panic("There is no direction to extend bound with antimeridian")
 		}
 		b.extendBoundUsingAntimeridian(point, direction[0])
-	}else {
+	} else {
 		b.sw.SetX(math.Min(b.sw.X(), point.X()))
 		b.ne.SetX(math.Max(b.ne.X(), point.X()))
 
@@ -212,7 +212,7 @@ func (b *Bound) extendBoundUsingAntimeridian(point *Point, direction ...byte) *B
 	}
 	if direction[0] == LEFT {
 		b.sw.SetX(point.X())
-	}else {
+	} else {
 		b.ne.SetX(point.X())
 	}
 	b.sw.SetY(math.Min(b.sw.Y(), point.Y()))
@@ -242,7 +242,7 @@ func (b *Bound) Contains(point *Point) bool {
 		if point.X() < b.sw.X() || b.ne.X() < point.X() {
 			return false
 		}
-	}else {
+	} else {
 		if !(b.sw.X() <= point.X() && point.X() <= MAX_LONGITUDE || MIN_LONGITUDE <= point.X() && point.X() <= b.ne.X()) {
 			return false
 		}
@@ -393,7 +393,7 @@ func (b *Bound) Left() float64 {
 
 // IsAntimeridian returns true if the bound uses antimeridian.
 func (b *Bound) IsAntimeridian() bool {
-	return  b.antimeridian
+	return b.antimeridian
 }
 
 // Empty returns true if it contains zero area or if
